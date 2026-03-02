@@ -1,4 +1,19 @@
 #Frontend
 
 #Backend
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual env
 .venv/
+venv/
+
+# Environment
+.env
+
+# IDE
+.vscode/
+.idea/
