@@ -1,5 +1,6 @@
 from typing import List, Dict
 from rerank.cross_encoder import CrossEncoderModel
+from config.settings import RERANK_TOP_N
 
 
 class Reranker:
@@ -7,7 +8,7 @@ class Reranker:
     def __init__(self, cross_encoder: CrossEncoderModel):
         self.cross_encoder = cross_encoder
 
-    def rerank(self, query: str, documents: List[Dict], top_n: int = 3):
+    def rerank(self, query: str, documents: List[Dict], top_n: int = RERANK_TOP_N):
 
         texts = [doc["text"] for doc in documents]
 

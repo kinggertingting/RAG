@@ -1,3 +1,5 @@
+import hashlib
+
 from config.settings import ALLOWED_EXTENSIONS, MAX_FILE_SIZE
 import PyPDF2
 import docx
@@ -73,3 +75,8 @@ class Loader:
 
         else:
             raise ValueError("Unsupported file type")
+        
+    def hash_content_file(self, file):
+        hash = hashlib.sha256()
+        hash.update(file.file.read())
+        return hash.hexdigest()

@@ -2,8 +2,6 @@ export interface UploadedFile {
   id: string
   name: string
   size: number
-  type: string
-  uploadedAt: Date
 }
 
 export interface Source {

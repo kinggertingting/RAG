@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { PanelLeft, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -24,8 +24,8 @@ import { FileSidebar } from "@/components/file-sidebar"
 import { ChatMessages } from "@/components/chat-messages"
 import { ChatInput } from "@/components/chat-input"
 import type { UploadedFile, Message, Source } from "@/lib/types"
+import { getAllFiles } from "@/lib/api"
 
-// Demo response generator for the UI prototype
 function generateDemoResponse(
   query: string,
   files: UploadedFile[]
@@ -74,16 +74,32 @@ export function RagChat() {
   const [isLoading, setIsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  const handleUpload = useCallback((newFiles: File[]) => {
-    const uploadedFiles: UploadedFile[] = newFiles.map((f) => ({
-      id: crypto.randomUUID(),
-      name: f.name,
-      size: f.size,
-      type: f.type,
-      uploadedAt: new Date(),
-    }))
-    setFiles((prev) => [...prev, ...uploadedFiles])
-  }, [])
+  useEffect(() => {
+  async function loadFiles() {
+    try {
+      const data = await getAllFiles()
+
+      const files: UploadedFile[] = data.files.map((f: any) => ({
+        id: f.file_id,
+        name: f.file_name,
+        size: 0,
+        type: "",
+        uploadedAt: new Date()
+      }))
+
+      setFiles(files)
+
+    } catch (err) {
+      console.error("Load files error:", err)
+    }
+  }
+
+  loadFiles()
+}, [])
+
+ const handleUpload = useCallback((uploadedFiles: UploadedFile[]) => {
+  setFiles((prev) => [...prev, ...uploadedFiles])
+}, [])
 
   const handleDelete = useCallback((id: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== id))
@@ -127,6 +143,8 @@ export function RagChat() {
       setIsLoading(false)
     },
     [files]
+
+    
   )
 
   return (

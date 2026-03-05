@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import type { UploadedFile } from "@/lib/types"
+import { uploadFile, checkFileSize, deleteFile, checkContentFile } from "@/lib/api"
 
 const ACCEPTED_TYPES: Record<string, string> = {
   "text/plain": ".txt",
@@ -47,7 +48,7 @@ function formatSize(bytes: number) {
 
 interface FileSidebarProps {
   files: UploadedFile[]
-  onUpload: (files: File[]) => void
+  onUpload: (files: UploadedFile[]) => void
   onDelete: (id: string) => void
   open: boolean
   onClose: () => void
@@ -65,16 +66,54 @@ export function FileSidebar({
   const dragCounter = useRef(0)
 
   const handleFiles = useCallback(
-    (fileList: FileList | null) => {
+    async (fileList: FileList | null) => {
       if (!fileList) return
+
       const valid = Array.from(fileList).filter((f) => {
         const ext = "." + f.name.split(".").pop()?.toLowerCase()
+
         return (
           Object.keys(ACCEPTED_TYPES).includes(f.type) ||
           ACCEPTED_EXTENSIONS.includes(ext)
         )
       })
-      if (valid.length > 0) onUpload(valid)
+
+      if (valid.length === 0) return
+
+      try {
+
+        await checkFileSize(valid)
+
+        const uploadedFiles: UploadedFile[] = []
+
+        for (const file of valid) {
+
+          const check = await checkContentFile(file)
+
+          if (check.exists) {
+            alert(`Content File "${file.name}" is already uploaded`)
+            continue
+          }
+
+         const result = await uploadFile(file)
+         console.log("result file_id:", result.file_id)
+
+          uploadedFiles.push({
+            id: result.file_id,
+            name: file.name,
+            size: file.size,
+          })
+        }
+
+        if (uploadedFiles.length > 0) {
+          onUpload(uploadedFiles)
+        }
+
+      } catch (err: any) {
+
+        alert(err.message || "Upload failed")
+
+      }
     },
     [onUpload]
   )
@@ -118,7 +157,6 @@ export function FileSidebar({
         !open && "lg:w-0 lg:border-r-0 lg:overflow-hidden"
       )}
     >
-      {/* Header */}
       <div className="flex items-center justify-between border-b border-sidebar-border px-4 py-3">
         <div className="flex items-center gap-2">
           <Upload className="size-4 text-primary" />
@@ -142,7 +180,6 @@ export function FileSidebar({
         </Button>
       </div>
 
-      {/* Drop zone */}
       <div className="px-3 pt-3">
         <div
           onDragEnter={onDragEnter}
@@ -193,7 +230,6 @@ export function FileSidebar({
         </div>
       </div>
 
-      {/* File list */}
       <ScrollArea className="flex-1 px-3 py-2">
         {files.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -226,7 +262,18 @@ export function FileSidebar({
                 <Button
                   variant="ghost"
                   size="icon-sm"
-                  onClick={() => onDelete(file.id)}
+                  onClick={async () => {
+                    try {
+
+                      await deleteFile(file.id)
+                      console.log(file.id)
+
+                      onDelete(file.id)
+
+                    } catch {
+                      alert("Không xoá được file")
+                    }
+                  }}
                   className="size-6 opacity-0 transition-opacity group-hover:opacity-100 text-muted-foreground hover:text-destructive"
                   aria-label={`Delete ${file.name}`}
                 >

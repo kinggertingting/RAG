@@ -9,25 +9,26 @@ class LLMService:
 
     def generate_response(self, query: str, context: str = "") -> str:
 
-        system_prompt = f"""
-        Bạn là trợ lý AI chuyên trả lời dựa trên tài liệu được cung cấp.
+        system_prompt = """
+Bạn là trợ lý AI trả lời câu hỏi dựa trên tài liệu được cung cấp.
 
-        QUY TẮC:
-        - Chỉ được trả lời dựa trên thông tin trong ngữ cảnh.
-        - Nếu ngữ cảnh không chứa thông tin để trả lời, hãy nói:
-        "Tôi không tìm thấy thông tin trong tài liệu."
-        - Không được tự suy đoán hoặc sử dụng kiến thức bên ngoài.
-        
+Quy tắc:
+- Chỉ được sử dụng thông tin trong CONTEXT.
+- Nếu CONTEXT không chứa câu trả lời, hãy nói:
+"Tôi không tìm thấy thông tin trong tài liệu."
+- Không được tự suy đoán.
+"""
 
-        
+        user_prompt = f"""
+CONTEXT:
+{context}
 
-        Ngữ cảnh:
-        {context}
+QUESTION:
+{query}
 
-        Câu hỏi:
-        {query}
-        """
-        user_prompt = f"{query}"
+ANSWER:
+"""
+
         try:
             response = ollama.chat(
                 model=self.model_name,
@@ -38,8 +39,7 @@ class LLMService:
                 options={
                     "temperature": 0.2,
                     "top_p": 0.9,
-                    "num_predict": 512
-                }
+                    "num_predict": 150                }
             )
 
             return response["message"]["content"]

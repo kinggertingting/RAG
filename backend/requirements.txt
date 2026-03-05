@@ -8,3 +8,4 @@ qdrant-client
 PyPDF2
 python-docx
 python-multipart
+rank-bm25

@@ -1,21 +1,43 @@
-from typing import List
 from ingestion.embedder import Embedder
 from vector_store.qdrant_store import QdrantStore
 from config.settings import TOP_K
+from retrieval.bm25_retriever import BM25Retriever
 
 
 class Retriever:
 
-    def __init__(self, embedder: Embedder, qdrant_store: QdrantStore):
+    def __init__(self, embedder=Embedder(), vector_store=QdrantStore(), bm25=BM25Retriever()):
         self.embedder = embedder
-        self.qdrant_store = qdrant_store
+        self.vector_store = vector_store
+        self.bm25 = bm25
 
-    def retrieve(self, query: str, top_k: int = TOP_K) -> List[str]:
+    def retrieve(self, query, top_k=TOP_K):
 
         query_vector = self.embedder.embedding_query(query)
 
-        results = self.qdrant_store.search(query_vector, top_k)
+        dense_results = self.vector_store.search(
+            query_vector,
+            top_k=top_k
+        )
 
-        texts = [r.payload["text"] for r in results]
+        documents = []
 
-        return texts
+        for r in dense_results:
+            documents.append({
+                "id": r.id,
+                "text": r.payload["text"],
+                "file_id": r.payload.get("file_id"),
+                "file_name": r.payload.get("file_name"),
+                "chunk_index": r.payload.get("chunk_index"),
+                "dense_score": r.score
+            })
+
+        if self.bm25:
+            self.bm25.index(documents)
+            sparse_results = self.bm25.retrieve(query, top_k=top_k)
+
+            combined = documents + sparse_results
+        else:
+            combined = documents
+
+        return combined

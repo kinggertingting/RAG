@@ -1,8 +1,9 @@
+import time
 from typing import List
 from retrieval.retriever import Retriever
 from rerank.rerank import Reranker
 from llm.llm_service import LLMService
-from config.settings import TOP_K, RERANK_TOP_N
+from config.settings import SCORE_THRESHOLD, TOP_K, RERANK_TOP_N
 
 
 class RAGPipeline:
@@ -18,17 +19,38 @@ class RAGPipeline:
         self.llm_service = llm_service
 
     def _build_context(self, documents: List[dict]) -> str:
-        return "\n\n".join(doc["text"] for doc in documents)
+        context = ""
 
-    def run(self, query: str) -> str:
+        for doc in documents:
+            context += f"""
+            FILE: {doc.get("file_name")}
+            CHUNK: {doc.get("chunk_index")}
 
-        retrieved_docs = self.retriever.retrieve(query, top_k=TOP_K)
+            {doc.get("text")}
+            ---------------------
+            """
+        return context
+
+    def run(self, query: str):
+
+        start_time = time.time()
+
+        retrieved_docs = self.retriever.retrieve(query)
 
         if not retrieved_docs:
-            return "Không tìm thấy thông tin liên quan."
+            return {
+                "answer": "Không tìm thấy thông tin liên quan.",
+                "contexts": []
+            }
 
-        if isinstance(retrieved_docs[0], str):
-            retrieved_docs = [{"text": t} for t in retrieved_docs]
+        # remove duplicates
+        unique_docs = {}
+        for doc in retrieved_docs:
+            key = (doc["file_id"], doc["chunk_index"])
+            if key not in unique_docs:
+                unique_docs[key] = doc
+
+        retrieved_docs = list(unique_docs.values())
 
         reranked_docs = self.reranker.rerank(
             query,
@@ -36,11 +58,27 @@ class RAGPipeline:
             top_n=RERANK_TOP_N
         )
 
-        context = self._build_context(reranked_docs)
+        confidence = max(doc["rerank_score"] for doc in reranked_docs)
+
+        if confidence < SCORE_THRESHOLD:
+            return {
+                "answer": "Tôi không tìm thấy thông tin trong tài liệu.",
+                "contexts": [],
+                "confidence": confidence
+            }
+
+        context = self._build_context(reranked_docs[:3])
 
         answer = self.llm_service.generate_response(
             query=query,
             context=context
         )
 
-        return answer
+        latency = time.time() - start_time
+
+        return {
+            "answer": answer,
+            "contexts": reranked_docs,
+            "confidence": confidence,
+            "latency": latency
+        }

@@ -1,11 +1,11 @@
 # Model
 EMBEDDING_MODEL = "intfloat/multilingual-e5-small"
 RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
-LLM_MODEL = 'qwen2:7b'
+LLM_MODEL = 'qwen2:1.5b'
 
 TOP_K = 8
 RERANK_TOP_N = 3
-SCORE_THRESHOLD = 0.35
+SCORE_THRESHOLD = 0.6
 # Chunking
 CHUNK_SIZE = 500
 OVERLAP = 50
@@ -20,6 +20,6 @@ VECTOR_DIM = 384 # Reuired by EMBEDDING_MODEL
 
 
 # Loader
-MAX_FILE_SIZE_MB = 50
+MAX_FILE_SIZE_MB = 100
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
-ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt"}
+ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".doc"}
