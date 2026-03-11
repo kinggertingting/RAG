@@ -1,0 +1,13 @@
+openai==1.30.5
+httpx==0.27.0
+nltk
+numpy
+sentence_transformers
+fastapi
+uvicorn[standard]
+qdrant-client
+PyPDF2
+python-docx
+python-multipart
+rank-bm25
+requests
