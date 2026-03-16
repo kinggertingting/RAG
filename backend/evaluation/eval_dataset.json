@@ -1,0 +1,34 @@
+[
+  {
+    "question": "What is the title of the graduation thesis?",
+    "ground_truth": "The thesis studies Generative Adversarial Networks (GAN) to handle imbalanced data for predicting student graduation classification."
+  },
+  {
+    "question": "What problem does the thesis aim to solve?",
+    "ground_truth": "The thesis aims to address the problem of imbalanced data when predicting student graduation classification."
+  },
+  {
+    "question": "What machine learning technique is mainly studied in the thesis?",
+    "ground_truth": "The thesis mainly studies Generative Adversarial Networks (GAN)."
+  },
+  {
+    "question": "Which traditional methods are compared with GAN in the research?",
+    "ground_truth": "The research compares GAN with undersampling and oversampling methods."
+  },
+  {
+    "question": "Which machine learning models are mentioned for classification?",
+    "ground_truth": "The models mentioned include Random Forest, Decision Tree, Naive Bayes, and Neural Networks."
+  },
+  {
+    "question": "What technologies are used to build the application?",
+    "ground_truth": "The technologies include TensorFlow, PyTorch, ReactJS, FastAPI, and Python."
+  },
+  {
+    "question": "What type of data is used in the thesis?",
+    "ground_truth": "The thesis uses student grade data from the Information Technology faculty."
+  },
+  {
+    "question": "What years of student data are used for training and testing?",
+    "ground_truth": "Student data from 2014 to 2016 are used for training and data from 2017 are used for testing."
+  }
+]

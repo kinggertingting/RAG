@@ -1,11 +1,11 @@
 import os
 from openai import OpenAI
-from config.settings import LLM_MODEL
+from config.settings import LLM_MODEL, LLM_BASE_URL
 
 class LLMService:
     def __init__(self, model_name: str = None):
         self.model_name = model_name or LLM_MODEL
-        base_url = os.getenv("LLM_BASE_URL", "http://llama-server:8080/v1")
+        base_url = LLM_BASE_URL
         
         self.client = OpenAI(base_url=base_url, api_key="dummy")
         print(f"[LLM] Using llama.cpp at: {base_url}")
