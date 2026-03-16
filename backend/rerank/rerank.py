@@ -5,8 +5,8 @@ from config.settings import RERANK_TOP_N
 
 class Reranker:
 
-    def __init__(self, cross_encoder: CrossEncoderModel):
-        self.cross_encoder = cross_encoder
+    def __init__(self, cross_encoder: CrossEncoderModel = None):
+        self.cross_encoder = cross_encoder or CrossEncoderModel()
 
     def rerank(self, query: str, documents: List[Dict], top_n: int = RERANK_TOP_N):
 

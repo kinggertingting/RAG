@@ -78,7 +78,7 @@ class RAGPipeline:
 
         confidence = max(doc["rerank_score"] for doc in reranked_docs)
 
-        context = self._build_context(reranked_docs[:3])
+        context = self._build_context(reranked_docs[:2])
 
         answer = self.llm_service.generate_response(
             query=query,

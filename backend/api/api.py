@@ -75,7 +75,7 @@ class QueryRequest(BaseModel):
 
 @app.on_event("startup")
 def init_qdrant():
-    client = QdrantClient(host="qdrant", port=6333)
+    client = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
     collection_name = "rag-collection"
 

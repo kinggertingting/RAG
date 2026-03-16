@@ -422,6 +422,17 @@ The system is designed with a **modular architecture**, making it easy to:
 
 ---
 
+### 6. RAG Evaluation (RAGAS)
+
+Faithfulness:        0.7143  
+Answer Relevancy:    0.5865  
+Context Precision:   0.9792  
+Context Recall:      1.0000
+
+These results indicate that the retriever retrieves highly relevant contexts (high precision and recall), while the generator produces mostly faithful responses grounded in retrieved documents.
+
+---
+
 # ⚠️ Limitations
 
 ### 1. Limited LLM Capability
